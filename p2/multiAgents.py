@@ -79,8 +79,7 @@ class ReflexAgent(Agent):
     #print "newScaredTimes = ", newScaredTimes
 
     totScore = 0
-    normalize = 0 
-    bigNormalize = 50 
+    normalize = 50 
     ghostOnetoPacman = util.manhattanDistance(ghostOne,newPosition)
 
     def numFoodFunc(currentGameState,successorGameState):
@@ -89,16 +88,10 @@ class ReflexAgent(Agent):
         if sucNum >= curNum:
             return 0
         else:
-            return bigNormalize
-
-    def stopFunc(action):
-        if action == Directions.STOP:
             return normalize
-        else:
-            return 0
 
     def findMinimum(foodLeftList):
-        bigFoodDist = 50
+        bigFoodDist = normalize
         for foodItem in foodLeftList:
             newDistance = util.manhattanDistance(foodItem,newPosition)
             if bigFoodDist < newDistance:
@@ -110,14 +103,10 @@ class ReflexAgent(Agent):
     #bigFoodDist = findMinimum(foodLeftList)
     totScore += ghostOnetoPacman 
     totScore += successorGameState.getScore() 
-    totScore -= (1 * findMinimum(foodLeftList))
-    #totScore -= stopFunc(action)
+    totScore -= findMinimum(foodLeftList)
     totScore += numFoodFunc(currentGameState,successorGameState)
         
     return totScore
-    "*** YOUR CODE HERE ***"
-    #return successorGameState.getScore()
-    #util.raiseNotDefined()
 
 def scoreEvaluationFunction(currentGameState):
   """
@@ -174,8 +163,102 @@ class MinimaxAgent(MultiAgentSearchAgent):
       gameState.getNumAgents():
         Returns the total number of agents in the game
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    treeDepth = self.treeDepth #the tree depth as global variable
+    numAgentsWithPac = gameState.getNumAgents()
+    actionChosen = Directions.STOP #initial action set -> will be used later
+    worstUtility = -9999999999
+    nextWorstUtil = -9999999999
+    turnSet = 1 #variable set for choosing which min's turn it is    
+
+    """
+     This method will find the minimum value between the two utilities
+     it recieves as input
+    """
+    def findMin(value1, value2):
+        if value1 < value2:
+            return value1
+        else:
+            return value2
+
+    """
+     This method will find the maximum value between the two utilities
+     it recieves as input
+    """
+    def findMax(value1, value2):
+        if value1 > value2:
+            return value1
+        else:
+            return value2
+ 
+    """
+     This will do the normal max part of the minimax algorithm pseudocode that can
+     be found in the slides and in the book
+    """ 
+    def doMax(gameState, treeDepth, turnSet):
+        if gameState.isWin() or gameState.isLose() or treeDepth == 0:
+            return self.evaluationFunction(gameState)
+        utility = -999999999 #basically negative infinity
+
+        """
+         Pacman scans through all possible actions it could take and finds
+         the maximum value it can get out of the ones returned.
+        """
+        for moveLeft in gameState.getLegalActions(0):
+            utility = findMax(utility, doMin(gameState.generateSuccessor(0, moveLeft), treeDepth - 1, turnSet))
+        return utility
+   
+    """
+     This will do the normal min part of the minimax algorithm pseudocode that can
+     be found in the slides and in the book
+    """  
+    def doMin(gameState, treeDepth, turnSet):
+        "numghosts = len(gameState.getGhostStates())"
+        if gameState.isWin() or gameState.isLose() or treeDepth == 0:
+            return self.evaluationFunction(gameState)
+        utility = 9999999999 #basically positive infinity
+
+        """
+         Depending on the value of turnSet either the first ghost will move
+         or the second ghost will move. In this case the second ghost moves first.
+
+         The bottom if statement allows the second ghost to go next instead of
+         pacman. Pacman will move after both these ghosts move.
+        """
+        if turnSet == 0:
+            for moveLeft in gameState.getLegalActions(2):
+                turnSet = 1;
+                utility = findMin(utility, doMax(gameState.generateSuccessor(2, moveLeft), treeDepth - 1, turnSet))
+        elif turnSet == 1:
+            for moveLeft in gameState.getLegalActions(1):
+                turnSet = 0;
+                utility = findMin(utility, doMin(gameState.generateSuccessor(1, moveLeft), treeDepth, turnSet))
+
+        return utility
+
+    """
+     This method calls the doMin method which respectively calls the doMax and
+     doMin interchangeably. It calls them interchangeably to allow the turn based
+     based moves between the pacman and the ghosts.
+    """
+    def doMinimax(gameState, worstUtility, turnSet, treeDepth, actionChosen):
+        """
+         This for loop is for all the possible movements that could be made.
+         They need to be looped through so that all positions are considered.
+        """
+        for moveLeft in gameState.getLegalActions():
+            nextWorstUtil = worstUtility
+            worstUtility = findMax(worstUtility, doMin(gameState.generateSuccessor(0, moveLeft), treeDepth, turnSet))
+            if worstUtility <= nextWorstUtil:
+                continue
+            else:
+                actionChosen = moveLeft
+        return actionChosen
+
+    finalAction = doMinimax(gameState, worstUtility, turnSet, treeDepth, actionChosen)
+    return finalAction
+
+    #util.raiseNotDefined()
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
   """
@@ -186,8 +269,119 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     """
       Returns the minimax action using self.treeDepth and self.evaluationFunction
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    treeDepth = self.treeDepth #the tree depth as global variable
+    numAgentsWithPac = gameState.getNumAgents()
+    actionChosen = Directions.STOP #initial action set -> will be used later
+    worstUtility = -9999999999
+    nextWorstUtil = -9999999999
+    alphaVal = -9999999999 
+    betaVal = 9999999999
+    turnSet = 1 #variable set for choosing which min's turn it is    
+
+    """
+     This method will find the minimum value between the two utilities
+     it recieves as input
+    """
+    def findMin(value1, value2):
+        if value1 < value2:
+            return value1
+        else:
+            return value2
+
+    """
+     This method will find the maximum value between the two utilities
+     it recieves as input
+    """
+    def findMax(value1, value2):
+        if value1 > value2:
+            return value1
+        else:
+            return value2
+
+    """
+     This will do the normal max part of the minimax algorithm pseudocode that can
+     be found in the slides and in the book
+    """ 
+    def doMax(gameState, treeDepth, turnSet, alphaVal, betaVal):
+        if gameState.isWin() or gameState.isLose() or treeDepth == 0:
+            return self.evaluationFunction(gameState)
+        utility = -9999999999 #basically negative infinity
+
+        """
+         Pacman scans through all possible actions it could take and finds
+         the maximum value it can get out of the ones returned.
+        """
+        for moveLeft in gameState.getLegalActions(0):
+            utility = findMax(utility, doMin(gameState.generateSuccessor(0, moveLeft), treeDepth - 1, turnSet, alphaVal, betaVal))
+            """
+             This basically checks to make sure the betaVal is greater than the utility value. If not
+             the utility value will get returned. It then finds the maximum between the current alpha value and
+             the utility value recieved and set that as the new utility value.
+            """
+            if utility >= betaVal:
+                return utility
+            alphaVal = findMax(alphaVal, utility);
+        return utility
+    """
+     This will do the normal min part of the minimax algorithm pseudocode that can
+     be found in the slides and in the book
+    """  
+    def doMin(gameState, treeDepth, turnSet, alphaVal, betaVal):
+        "numghosts = len(gameState.getGhostStates())"
+        if gameState.isWin() or gameState.isLose() or treeDepth == 0:
+            return self.evaluationFunction(gameState)
+        utility = 9999999999 #basically positive infinity
+
+        """
+         Depending on the value of turnSet either the first ghost will move
+         or the second ghost will move. In this case the second ghost moves first.
+
+         The bottom if statement allows the second ghost to go next instead of
+         pacman. Pacman will move after both these ghosts move.
+        """
+        if turnSet == 0:
+            for moveLeft in gameState.getLegalActions(2):
+                turnSet = 1;
+                utility = findMin(utility, doMax(gameState.generateSuccessor(2, moveLeft), treeDepth - 1, turnSet, alphaVal, betaVal))
+                if utility <= alphaVal:
+                    return utility
+                betaVal = findMin(betaVal, utility)
+        elif turnSet == 1:
+            for moveLeft in gameState.getLegalActions(1):
+                turnSet = 0;
+                utility = findMin(utility, doMin(gameState.generateSuccessor(1, moveLeft), treeDepth, turnSet, alphaVal, betaVal))
+                """
+                 This basically checks to make sure the alphaVal is greater than the utility value. If not
+                 the utility value will get returned. It then finds the minimum between the current beta value
+                 and the utility value recieved and set that as the new utility value.
+                """
+                if utility <= alphaVal:
+                    return utility
+                betaVal = findMin(betaVal, utility);
+
+        return utility
+
+    """
+     This is the minimax main that will call the max portion first because it's first pacman's turn
+    """
+    def doMinimax(gameState, worstUtility, turnSet, treeDepth, actionChosen, alphaVal, betaVal):
+        """
+         This for loop is for all the possible movements that could be made.
+         They need to be looped through so that all positions are considered.
+        """
+        for moveLeft in gameState.getLegalActions():
+            nextWorstUtil = worstUtility
+            worstUtility = findMax(worstUtility, doMin(gameState.generateSuccessor(0, moveLeft), treeDepth, turnSet, alphaVal, betaVal))
+            if worstUtility <= nextWorstUtil:
+                continue
+            else:
+                actionChosen = moveLeft
+        return actionChosen
+
+    finalAction = doMinimax(gameState, worstUtility, turnSet, treeDepth, actionChosen, alphaVal, betaVal)
+    return finalAction
+
+
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
   """
