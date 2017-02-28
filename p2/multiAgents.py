@@ -62,26 +62,24 @@ class ReflexAgent(Agent):
     """
     # Useful information you can extract from a GameState (pacman.py)
     successorGameState = currentGameState.generatePacmanSuccessor(action)
-    #print "successorGameState = ", successorGameState
     newPosition = successorGameState.getPacmanPosition()
-    #print "newPosition = ", newPosition
 
+    # All food variables created here
     oldFood = currentGameState.getFood()
     foodLeft = successorGameState.getFood()
     foodLeftList = foodLeft.asList()
 
-    #print "oldFood = ", oldFood
+    # All ghost variables created here 
     newGhostStates = successorGameState.getGhostStates()
-    #print "newGhostStates = ", newGhostStates
     newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
     ghostOne = currentGameState.getGhostPosition(1)
-    #ghostTwo = currentGameState.getGhostPosition(2)
-    #print "newScaredTimes = ", newScaredTimes
 
+    # The rest of the varibles are created here
     totScore = 0
     normalize = 50 
     ghostOnetoPacman = util.manhattanDistance(ghostOne,newPosition)
 
+    # Return 0 or the normalized value depending on what the food value is
     def numFoodFunc(currentGameState,successorGameState):
         curNum = currentGameState.getNumFood()
         sucNum = successorGameState.getNumFood()
@@ -90,6 +88,7 @@ class ReflexAgent(Agent):
         else:
             return normalize
 
+    # Find the minimum of the food list passed in as a parameter
     def findMinimum(foodLeftList):
         bigFoodDist = normalize
         for foodItem in foodLeftList:
@@ -100,7 +99,7 @@ class ReflexAgent(Agent):
                 bigFoodDist = newDistance
         return bigFoodDist
 
-    #bigFoodDist = findMinimum(foodLeftList)
+    # Add up all the scores that make up the total score 
     totScore += ghostOnetoPacman 
     totScore += successorGameState.getScore() 
     totScore -= findMinimum(foodLeftList)
@@ -164,6 +163,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns the total number of agents in the game
     """
 
+    # All the variables are created right here
     treeDepth = self.treeDepth #the tree depth as global variable
     numAgentsWithPac = gameState.getNumAgents()
     actionChosen = Directions.STOP #initial action set -> will be used later
@@ -320,7 +320,8 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             """
             if utility >= betaVal:
                 return utility
-            alphaVal = findMax(alphaVal, utility);
+            else: 
+                alphaVal = findMax(alphaVal, utility)
         return utility
     """
      This will do the normal min part of the minimax algorithm pseudocode that can
@@ -345,7 +346,8 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 utility = findMin(utility, doMax(gameState.generateSuccessor(2, moveLeft), treeDepth - 1, turnSet, alphaVal, betaVal))
                 if utility <= alphaVal:
                     return utility
-                betaVal = findMin(betaVal, utility)
+                else:
+                    betaVal = findMin(betaVal, utility)
         elif turnSet == 1:
             for moveLeft in gameState.getLegalActions(1):
                 turnSet = 0;
@@ -357,8 +359,8 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 """
                 if utility <= alphaVal:
                     return utility
-                betaVal = findMin(betaVal, utility);
-
+                else:
+                    betaVal = findMin(betaVal, utility)
         return utility
 
     """
@@ -395,8 +397,62 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
       All ghosts should be modeled as choosing uniformly at random from their
       legal moves.
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    """
+     Calculating the average of the list and returing that value
+    """
+    def calcAvg(myList):
+        myList = list(myList)
+        return sum(myList)/len(myList)
+
+    """
+     This method does all the calculations for expectimax. This
+     method gets called below
+    """
+    def lookDepth(state, depth, agent):
+        """
+         Calls this same method again when agent == state.getNumAgents() or 
+         the evaluationFunction instead
+        """
+        if agent == state.getNumAgents():
+            if depth != self.treeDepth:
+                return lookDepth(state, depth + 1, 0)
+            else:
+                return self.evaluationFunction(state)
+        else:
+            actions = state.getLegalActions(agent)
+
+            # If the length is equal to 0, call the evaluationFunction
+            if len(actions) == 0:
+                return self.evaluationFunction(state)
+
+            """
+             Creates a tuple called nextVals with a for loop and calling lookDepth
+             inside the tuple.
+            """
+            nextVals = (
+                lookDepth(state.generateSuccessor(agent, action), depth, agent + 1)
+                for action in actions
+            )
+
+            # Returns the max of the values choses. The tuple is passed in to a method
+            # of either max or calcAvg
+            if (agent == 0):
+                return max(nextVals)
+            else:
+                return calcAvg(nextVals)
+
+    """
+     This method returns the max between the legalstates and the 
+     lookdepth method. The lookDepth is passed in with the lambda function
+    """
+    def doExpecti():
+        return max(
+            gameState.getLegalActions(0),
+            key = lambda x: lookDepth(gameState.generateSuccessor(0, x), 1, 1)
+        )
+
+    return doExpecti()
 
 def betterEvaluationFunction(currentGameState):
   """
@@ -404,6 +460,7 @@ def betterEvaluationFunction(currentGameState):
     evaluation function (question 5).
 
     DESCRIPTION: <write something here so we know what you did>
+    Not enough time to attempt this question
   """
   "*** YOUR CODE HERE ***"
   util.raiseNotDefined()
