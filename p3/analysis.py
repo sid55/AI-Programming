@@ -27,11 +27,12 @@ def question2():
   return answerDiscount, answerNoise
 
 def question3a():
-  answerDiscount = 0.9
-  answerNoise = 0.2
-  answerLivingReward = 0.0
+  answerDiscount = 0.5
+  answerNoise = 0.001
+  answerLivingReward = -1
   """Description:
-  [Enter a description of what you did here.]
+  Kept adjusting the values till I got the result that was expected. I put a huge
+  living reward to get the expected output 
   """
   """ YOUR CODE HERE """
 
@@ -40,11 +41,12 @@ def question3a():
   # If not possible, return 'NOT POSSIBLE'
 
 def question3b():
-  answerDiscount = 0.9
-  answerNoise = 0.2
-  answerLivingReward = 0.0
+  answerDiscount = 0.5
+  answerNoise = 0.4
+  answerLivingReward = -0.3
   """Description:
-  [Enter a description of what you did here.]
+  Kept adjusting the values until I got the result. I mostly changed the living 
+  reward and it seemed that made the most effect for me.
   """
   """ YOUR CODE HERE """
 
@@ -53,11 +55,11 @@ def question3b():
   # If not possible, return 'NOT POSSIBLE'
 
 def question3c():
-  answerDiscount = 0.9
-  answerNoise = 0.2
-  answerLivingReward = 0.0
+  answerDiscount = 1
+  answerNoise = 0.001
+  answerLivingReward = -0.3
   """Description:
-  [Enter a description of what you did here.]
+  I kept changing the values, mainly the answerDiscount until I got the result I was looking for
   """
   """ YOUR CODE HERE """
 
@@ -70,7 +72,7 @@ def question3d():
   answerNoise = 0.2
   answerLivingReward = 0.0
   """Description:
-  [Enter a description of what you did here.]
+  I did not change the code for this question 
   """
   """ YOUR CODE HERE """
 
@@ -83,7 +85,7 @@ def question3e():
   answerNoise = 0.2
   answerLivingReward = 0.0
   """Description:
-  [Enter a description of what you did here.]
+  I did not change the code for this question 
   """
   """ YOUR CODE HERE """
 
@@ -95,12 +97,14 @@ def question6():
   answerEpsilon = None
   answerLearningRate = None
   """Description:
-  [Enter a description of what you did here.]
+  Returned not possible in this question with the epsilon and
+  the answerLearningRate. Forgot to change this earlier as a heads up
+  but changed it in last or some of most recent solutions.
   """
   """ YOUR CODE HERE """
 
   """ END CODE """
-  return answerEpsilon, answerLearningRate
+  return 'NOT POSSIBLE' 
   # If not possible, return 'NOT POSSIBLE'
 
 if __name__ == '__main__':

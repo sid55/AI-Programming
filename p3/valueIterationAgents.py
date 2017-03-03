@@ -36,7 +36,13 @@ class ValueIterationAgent(ValueEstimationAgent):
     self.iters = iters
     self.values = util.Counter() # A Counter is a dict with default 0
     """Description:
-    [Enter a description of what you did here.]
+    In this piece of code I first created two methods that would find the 
+    maximum and minimum as said in the name. The core of the logic is in the
+    while loop with two inner for loops. I basically loop through all the
+    iterations specified and in each iteration loop through all the states. I check
+    if each state is the terminal state. If it is not I perform another for loop going
+    through all the possible actions and get the corresponding q-values. The code will
+    finish when all iterations are complete 
     """
     """ YOUR CODE HERE """
     #self.values2 = util.Counter()
@@ -98,6 +104,8 @@ class ValueIterationAgent(ValueEstimationAgent):
       to derive it on the fly.
     """
     """Description:
+    I followed the formula provided for us and just substituted the corresponding names
+    in the right places. I do this for all the transition states of a given action
     """
     """ YOUR CODE HERE """
     qvalTot = 0
@@ -116,7 +124,10 @@ class ValueIterationAgent(ValueEstimationAgent):
     """
 
     """Description:
-    [Enter a description of what you did here.]
+    I do a similar thing as I have done in the above method, because the formula
+    is extremely similar. The difference is that I now go through the length of all
+    the possible actions and then loop through all the possible actions. From there,
+    I apply the formula I have in the above method as well.
     """
     """ YOUR CODE HERE """
     #util.raiseNotDefined()
